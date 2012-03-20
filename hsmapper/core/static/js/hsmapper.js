@@ -124,8 +124,9 @@ function init() {
   map.addControl(new OpenLayers.Control.MousePosition());
 
   globals.hospital_layer.events.register("moveend", globals.hospital_layer,
-    function() {
-      if (globals.selectedFeature) {
+    function(e) {
+      if (globals.selectedFeature && e.zoomChanged) {
+        globals.selectedFeature.layer = globals.hospital_layer;
         globals.selectControl.unselect(globals.selectedFeature);
       }
     }
@@ -133,32 +134,9 @@ function init() {
 
   map.events.register("click", map, function(e) {
     if (globals.insert_mode) {
-      if (globals.selectedFeature) {
-        globals.selectControl.unselect(globals.selectedFeature);
-      }
       var p = map.getLonLatFromPixel(e.xy);
       var point = new OpenLayers.Geometry.Point(p["lon"], p["lat"]);
-      var f = new OpenLayers.Feature.Vector(point);
-      //globals.hospital_layer.addFeatures([f]);
-
-      $.ajax({
-        url: globals.urls.add,
-        type: "post",
-        data: {lat: p["lat"], lon: p["lon"]},
-        success: function(req) {
-          globals.hospital_layer.refresh();
-          if (req.success === true) {
-            alert_msg(gettext("Point inserted"), "success");
-            f.attributes["id"] = req.id;
-            f.layer = globals.hospital_layer;
-            onFeatureSelect(f, true);
-          }
-          else {
-            alert_msg(gettext("Error :("));
-          }
-        }
-      });
-      toggle_insert();
+      insert_feature(point, p);
     }
   });
 
@@ -231,6 +209,34 @@ function onPopupClose(evt) {
   globals.selectControl.unselect(globals.selectedFeature);
 }
 
+function insert_feature(point) {
+      if (globals.selectedFeature) {
+        globals.selectControl.unselect(globals.selectedFeature);
+      }
+
+      var f = new OpenLayers.Feature.Vector(point);
+      //globals.hospital_layer.addFeatures([f]);
+
+      $.ajax({
+        url: globals.urls.add,
+        type: "post",
+        data: {lat: point.y, lon: point.x},
+        success: function(req) {
+          globals.hospital_layer.refresh();
+          if (req.success === true) {
+            alert_msg(gettext("Point inserted"), "success");
+            f.attributes["id"] = req.id;
+            f.layer = globals.hospital_layer;
+            onFeatureSelect(f, true);
+          }
+          else {
+            alert_msg(gettext("Error :("));
+          }
+        }
+      });
+      toggle_insert();
+}
+
 function delete_feature(feature) {
   return function() {
     var agree = confirm(gettext("Are you sure you want to delete?"));
@@ -259,6 +265,11 @@ function delete_feature(feature) {
 }
 
 function onFeatureSelect(feature, not_expired) {
+  if (globals.insert_mode) {
+    insert_feature(feature.geometry);
+    return;
+  }
+
   if (globals.selectedFeature) {
     globals.selectControl.unselect(globals.selectedFeature);
   }
@@ -269,24 +280,33 @@ function onFeatureSelect(feature, not_expired) {
     if (feature.cluster) {
       var points_list = $("<ul/>");
 
+      var click_callback = function(f) {
+        return function() {
+          f.layer = globals.hospital_layer
+          globals.selectControl.unselect(globals.selectedFeature);
+          globals.selectControl.select(f);
+          return false;
+        }
+      }
+
+      if (feature.cluster.length === 1 && !globals.username) {
+        click_callback(feature.cluster[0])();
+        return;
+      }
+
       for (var i=0; i<feature.cluster.length; i++) {
         var f = feature.cluster[i];
         var name = f.attributes["name"] || gettext("No name");
-        var click_callback = function(f) {
-          return function() {
-            f.layer = globals.hospital_layer
-            globals.selectControl.unselect(globals.selectedFeature);
-            globals.selectControl.select(f);
-            return false;
-          }
-        }
-        points_list.append(
-          $("<li/>").append(
-            $("<span/>").addClass("a").text(name).click(click_callback(f))
-          ).append(
-            $("<span/>").click(delete_feature(f)).addClass("close del_point").text("×")
-          )
+
+        var list_elem = $("<li/>").append(
+          $("<span/>").addClass("a").text(name).click(click_callback(f))
         );
+        if (globals.username) {
+          list_elem.append(
+            $("<span/>").click(delete_feature(f)).addClass("close del_point").text("×")
+          );
+        }
+        points_list.append(list_elem);
         msg += "<p>" + name + "</p>";
       }
 
@@ -398,6 +418,10 @@ function onFeatureUnselect(feature) {
   }
   globals.selectedFeature = undefined;
   $("#edit_info").empty();
+  if (globals.editedFeature) {
+    globals.hospital_layer.refresh();
+    globals.editedFeature = false;
+  }
 }
 
 function toggle_insert() {
@@ -430,6 +454,6 @@ function alert_msg(msg, level) {
     $("#alert_box .alert-message").addClass(level);
     $("#alert_box .alert-message").addClass("in");
     $("#alert_msg").html(msg);
-    globals.close_timeout = setTimeout("$('.close').click()", 5000);
+    globals.close_timeout = setTimeout("$('#alert_msg').find('.close').click()", 5000);
   });
 }
