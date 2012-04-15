@@ -197,12 +197,18 @@ function init() {
         map.getLayersByName($(ui.option).val())[0].setVisibility(false);
       }
   });
+
   $.nominatim("#autocomplete", {select: function(item) {
     var bb = item.boundingbox;
     bb = new OpenLayers.Bounds(bb[2], bb[0], bb[3], bb[1]);
     bb = bb.transform(new OpenLayers.Projection('EPSG:4326'), new OpenLayers.Projection('EPSG:900913'));
     map.zoomToExtent(bb);
   }});
+
+  $("#search_button").click(function() {
+    globals.hospital_layer.protocol.options.url = globals.urls.get + "?search=" + $("#search").val();
+    globals.hospital_layer.refresh();
+  });
 }
 
 function onPopupClose(evt) {

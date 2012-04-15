@@ -159,13 +159,15 @@ a:hover {
     font-size: 9px;
 }
 
-#nominatim {
+#nominatim, #search_box {
     padding-top: 3%;
     padding-bottom: 3%;
+    text-align: center;
 }
 
-#nominatim label {
+#nominatim label  {
     width: inherit;
+    float: inherit;
     padding-left: 2%;
     padding-right: 2%;
 }
