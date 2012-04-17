@@ -23,7 +23,6 @@
     var globals = {};
     var map;
     globals.insert_mode = false;
-    globals.delete_mode = false;
     globals.server_ip = "{{ server_ip }}";
     globals.geoserver_port = "{{ geoserver_port }}";
     globals.srid = "{{ srid }}";
@@ -40,6 +39,7 @@
     {% endif %}
     globals.hospital_layer;
     globals.selectedFeature;
+    globals.editedFeature;
   </script>
   <script type="text/javascript" src="{{ STATIC_URL }}js/hsmapper.jeditable.js"></script>
   <script type="text/javascript" src="{{ STATIC_URL }}js/hsmapper.js"></script>
@@ -47,7 +47,6 @@
     $(document).ready(function() {
       $("#tabs").tabs();
       $("#insert_button").click(toggle_insert);
-      $("#delete_button").click(toggle_delete);
       init();
       $("#tabs").height("100%");
       $(".list-container").width("49%");
@@ -66,21 +65,30 @@
       <li><a href="#tabs-3">{% trans "Contact us" %}</a></li>
     </ul>
     <div id="tabs-1">
+
       <select id="layers" class="multiselect" multiple="multiple" name="layers[]">
       </select>
+
       <div id="nominatim">
         <label for="autocomplete">{% trans "Go to address" %}:</label>
         <input type="text" name="autocomplete" id="autocomplete" />
       </div>
+
+      <div id="search_box">
+        <input type="text" name="search" id="search" placeholder="{% trans "Type to search..." %}" />
+        <button class="btn" id="search_button">{% trans "Search" %}</button>
+      </div>
+
       <div class="buttons">
         {% if user.is_authenticated %}
           <button class="btn" id="insert_button">{% trans "Insert point" %}</button>
-          <button class="btn" id="delete_button">{% trans "Delete point" %}</button>
         {% endif %}
       </div>
+
       <div>
         <div id="edit_info"></div>
       </div>
+
     </div>
     <div id="tabs-2">
       <p> {% trans "The project is developed in collaboration with the Italian pediatrics association (S.I.P. - Società Italiana di Pediatria). It aims at developing a new informatics platform that helps context-aware location of health facilities, supporting the timely access to the most appropriate health resource." %}</p>

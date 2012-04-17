@@ -22,6 +22,7 @@ function save_feature_edit(value, settings) {
         alert_msg(gettext("Error :("), "error");
       }
       $("#updated_by").text(globals.username);
+      globals.editedFeature = true;
     }
   });
   return display_msg;
@@ -95,10 +96,10 @@ function save_timetable_edit(value, settings) {
       }
       else {
         alert_msg(gettext("Error :("), "error");
-        console.log(that);
         $(that).text("00:00");
       }
       $("#updated_by").text(globals.username);
+      globals.editedFeature = true;
     }
   });
   return display_msg;
@@ -137,6 +138,7 @@ function save_manytomany_edit(sing, plur) {
           alert_msg(gettext("Error :("), "error");
         }
         $("#updated_by").text(globals.username);
+        globals.editedFeature = true;
       }
     });
 

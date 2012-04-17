@@ -159,13 +159,15 @@ a:hover {
     font-size: 9px;
 }
 
-#nominatim {
+#nominatim, #search_box {
     padding-top: 3%;
     padding-bottom: 3%;
+    text-align: center;
 }
 
-#nominatim label {
+#nominatim label  {
     width: inherit;
+    float: inherit;
     padding-left: 2%;
     padding-right: 2%;
 }
@@ -272,4 +274,26 @@ ul.ui-widget-header {
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+}
+
+.a {
+    cursor: pointer;
+    color: #222;
+    font-size: 12px;
+}
+
+.a:hover {
+    text-decoration: underline;
+}
+
+.del_point {
+    float: none;
+    color: red;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.del_point:hover {
+    color: red;
+    opacity: 1;
 }

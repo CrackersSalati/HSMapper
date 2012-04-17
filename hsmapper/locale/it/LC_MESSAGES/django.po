@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-26 13:26+0100\n"
+"POT-Creation-Date: 2012-04-15 18:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: settings.py:39
+#: settings.py:35
 msgid "Italian"
 msgstr "Italiano"
 
-#: settings.py:40
+#: settings.py:36
 msgid "English"
 msgstr "Inglese"
 
@@ -35,7 +35,7 @@ msgstr "Nome"
 msgid "Pathology"
 msgstr "Patologia"
 
-#: core/models.py:19 core/models.py:55 core/templates/hospital_info.html:61
+#: core/models.py:19 core/models.py:57 core/templates/hospital_info.html:61
 msgid "Pathologies"
 msgstr "Patologie"
 
@@ -47,7 +47,7 @@ msgstr "Prestazione"
 msgid "Medical Services"
 msgstr "Prestazioni"
 
-#: core/models.py:40 core/models.py:53
+#: core/models.py:40 core/models.py:54
 msgid "Facility Type"
 msgstr "Tipo di Struttura"
 
@@ -79,103 +79,103 @@ msgstr "Telefono"
 msgid "E-mail"
 msgstr "E-mail"
 
-#: core/models.py:57 core/templates/hospital_info.html:73
+#: core/models.py:60 core/templates/hospital_info.html:73
 msgid "Services"
 msgstr "Prestazioni"
 
-#: core/models.py:59 core/templates/hospital_info.html:92
+#: core/models.py:62 core/templates/hospital_info.html:92
 msgid "Last update"
 msgstr "Ultimo aggiornamento"
 
-#: core/models.py:60 core/templates/hospital_info.html:99
+#: core/models.py:63 core/templates/hospital_info.html:99
 msgid "Updated by"
 msgstr "Aggiornato da"
 
-#: core/models.py:62 core/templates/hospital_info.html:85
+#: core/models.py:65 core/templates/hospital_info.html:85
 msgid "Expiration"
 msgstr "Validità"
 
-#: core/models.py:63 core/templates/hospital_info.html:107
+#: core/models.py:66 core/templates/hospital_info.html:107
 msgid "Open 24h"
 msgstr "Aperto 24 ore"
 
-#: core/models.py:68
+#: core/models.py:71
 msgid "<No name>"
 msgstr "<Nessun nome>"
 
-#: core/models.py:71 core/models.py:85 core/models.py:111
+#: core/models.py:74 core/models.py:88 core/models.py:114
 msgid "Facility"
 msgstr "Struttura"
 
-#: core/models.py:72
+#: core/models.py:75
 msgid "Facilities"
 msgstr "Strutture"
 
-#: core/models.py:75
+#: core/models.py:78
 msgid "Monday"
 msgstr "Lunedì"
 
-#: core/models.py:76
+#: core/models.py:79
 msgid "Tuesday"
 msgstr "Martedì"
 
-#: core/models.py:77
+#: core/models.py:80
 msgid "Wednesday"
 msgstr "Mercoledì"
 
-#: core/models.py:78
+#: core/models.py:81
 msgid "Thursday"
 msgstr "Giovedì"
 
-#: core/models.py:79
+#: core/models.py:82
 msgid "Friday"
 msgstr "Venerdì"
 
-#: core/models.py:80
+#: core/models.py:83
 msgid "Saturday"
 msgstr "Sabato"
 
-#: core/models.py:81
+#: core/models.py:84
 msgid "Sunday"
 msgstr "Domenica"
 
-#: core/models.py:86 core/models.py:114
+#: core/models.py:89 core/models.py:117
 msgid "Opening time"
 msgstr "Orario di apertura"
 
-#: core/models.py:87 core/models.py:115
+#: core/models.py:90 core/models.py:118
 msgid "Closing time"
 msgstr "Orario di chiusura"
 
-#: core/models.py:88
+#: core/models.py:91
 msgid "Weekday"
 msgstr "Giorno della settimana"
 
-#: core/models.py:89
+#: core/models.py:92
 msgid "Index"
 msgstr "Indice"
 
-#: core/models.py:105
+#: core/models.py:108
 msgid "Opening Time"
 msgstr "Orario di apertura"
 
-#: core/models.py:106
+#: core/models.py:109
 msgid "Opening Times"
 msgstr "Orari di apertura"
 
-#: core/models.py:112
+#: core/models.py:115
 msgid "Date"
 msgstr "Data"
 
-#: core/models.py:113
+#: core/models.py:116
 msgid "Closed all day"
 msgstr "Chiuso tutto il giorno"
 
-#: core/models.py:118
+#: core/models.py:121
 msgid "Special Day"
 msgstr "Giorno speciale"
 
-#: core/models.py:119
+#: core/models.py:122
 msgid "Special Days"
 msgstr "Giorni speciali"
 
@@ -203,31 +203,35 @@ msgstr "Errore"
 msgid "something went wrong"
 msgstr "si è verificato un errore"
 
-#: core/templates/home.html:64
+#: core/templates/home.html:63
 msgid "Map Control"
 msgstr "Gestione mappa"
 
-#: core/templates/home.html:65
+#: core/templates/home.html:64
 msgid "About"
 msgstr "About"
 
-#: core/templates/home.html:66
+#: core/templates/home.html:65
 msgid "Contact us"
 msgstr "Contatti"
 
-#: core/templates/home.html:72
+#: core/templates/home.html:73
 msgid "Go to address"
 msgstr "Vai all'indirizzo"
 
-#: core/templates/home.html:77
+#: core/templates/home.html:78
+msgid "Type to search..."
+msgstr "Digita per cercare..."
+
+#: core/templates/home.html:79
+msgid "Search"
+msgstr "Cerca"
+
+#: core/templates/home.html:84
 msgid "Insert point"
 msgstr "Inserisci punto"
 
-#: core/templates/home.html:78
-msgid "Delete point"
-msgstr "Elimina punto"
-
-#: core/templates/home.html:86
+#: core/templates/home.html:94
 msgid ""
 "The project is developed in collaboration with the Italian pediatrics "
 "association (S.I.P. - Società Italiana di Pediatria). It aims at developing "
@@ -239,7 +243,7 @@ msgstr ""
 "Pediatria (S.I.P.). L'obbiettivo è sviluppare un supporto informatico che "
 "aiuti nell'individuazione del centro pediatrico idoneo."
 
-#: core/templates/home.html:89
+#: core/templates/home.html:97
 msgid "Developed by"
 msgstr "Sviluppato da"
 
@@ -279,6 +283,9 @@ msgstr "Log out effettuato"
 msgid "Redirect..."
 msgstr "Redirect..."
 
-#: core/views/api.py:126
+#: core/views/api.py:121
 msgid "None"
 msgstr "Nessuna"
+
+#~ msgid "Delete point"
+#~ msgstr "Elimina punto"

@@ -20,11 +20,18 @@ from core.helpers import lookup_query, timetable_filler, \
 
 
 def get_hospitals(request):
-    qs = Facility.objects.exclude(the_geom=None)
+    qs = Facility.objects.all()
+
+    # TODO: Only for test! must be rewritten ASAP
+    search = request.GET.get("search", None)
+    if search:
+        pathologies = Pathology.objects.filter(name__contains=search)
+        qs = set()
+        for p in pathologies:
+            qs.update(p.facility_set.all())
+
     djf = Django.Django(geodjango="the_geom",
-                        properties=['id', 'name', 'description', 'manager_id',
-                                    'address', 'phone', 'email',
-                                    'facility_type_id'])
+                        properties=["id", "name"])
     geoj = GeoJSON.GeoJSON()
     geojson_output = geoj.encode(djf.decode(qs))
     response = HttpResponse(mimetype="application/json")

@@ -57,26 +57,42 @@ function init() {
   var osm = new OpenLayers.Layer.OSM("OSM",
       "http://tile.openstreetmap.org/${z}/${x}/${y}.png",
       {sphericalMercator: true, isBaseLayer:true});
-  var default_style = new OpenLayers.Style({
-                              graphicName: "circle",
-                              strokeColor: "#ff0000",
-                              fillColor: "#ff0000",
-                              pointRadius: "5",
-                              fillOpacity: 0.7,
-                              strokeWidth: "0.5"
-  });
+
+  var clusterStyle = new OpenLayers.Style(
+    {
+      graphicName: "circle",
+      strokeColor: "#ff0000",
+      fillColor: "#ff0000",
+      pointRadius: "${radius}",
+      fillOpacity: 0.5,
+      strokeWidth: "${width}"
+    },
+    {
+      context: {
+        radius: function(feature) {
+          if (feature.attributes.count == 1) return 5;
+          return Math.min(Math.ceil(feature.attributes.count / 5), 25) + 5;
+        },
+        width: function(feature) {
+          return (feature.attributes.count > 1) ? 3 : 1;
+        }
+      }
+    }
+  );
 
   globals.hospital_layer = new OpenLayers.Layer.Vector(
        "Health facilities",
-      {styleMap: default_style,
+      {styleMap: clusterStyle,
        projection: new OpenLayers.Projection("EPSG:"+globals.srid),
-       strategies: [new OpenLayers.Strategy.Fixed()],
+       strategies: [new OpenLayers.Strategy.Fixed(),
+                    new OpenLayers.Strategy.Cluster()],
        protocol: new OpenLayers.Protocol.HTTP({
           url: globals.urls.get,
           format: new OpenLayers.Format.GeoJSON()
        })
       }
   );
+
   globals.hospital_layer.events.register("featuresadded", globals.hospital_layer,
     function() {
       var extent = globals.hospital_layer.getDataExtent();
@@ -90,11 +106,13 @@ function init() {
   map.addLayers([osm, globals.hospital_layer]);
   map.zoomToMaxExtent();
 
-  selectControl = new OpenLayers.Control.SelectFeature(
-                  [globals.hospital_layer],{clickout: true, toggle: false,
-                                    multiple: false, hover: false });
-  map.addControl(selectControl);
-  selectControl.activate();
+  globals.selectControl = new OpenLayers.Control.SelectFeature(
+    [globals.hospital_layer],
+    {clickout: true, toggle: false, multiple: false, hover: false }
+  );
+  map.addControl(globals.selectControl);
+  globals.selectControl.activate();
+
   globals.hospital_layer.events.on({
     "featureselected": function(e) {
       onFeatureSelect(e.feature);
@@ -105,34 +123,43 @@ function init() {
   });
   map.addControl(new OpenLayers.Control.MousePosition());
 
+  globals.hospital_layer.events.register("moveend", globals.hospital_layer,
+    function(e) {
+      if (globals.selectedFeature && e.zoomChanged) {
+        globals.selectedFeature.layer = globals.hospital_layer;
+        globals.selectControl.unselect(globals.selectedFeature);
+      }
+    }
+  );
+
   map.events.register("click", map, function(e) {
     if (globals.insert_mode) {
-      if (globals.selectedFeature) {
-        selectControl.unselect(globals.selectedFeature);
-      }
       var p = map.getLonLatFromPixel(e.xy);
       var point = new OpenLayers.Geometry.Point(p["lon"], p["lat"]);
-      var f = new OpenLayers.Feature.Vector(point);
-      globals.hospital_layer.addFeatures([f]);
-
-      $.ajax({
-        url: globals.urls.add,
-        type: "post",
-        data: {lat: p["lat"], lon: p["lon"]},
-        success: function(req) {
-          if (req.success === true) {
-            alert_msg(gettext("Point inserted"), "success");
-            f.attributes["id"] = req.id;
-            onFeatureSelect(f, true);
-          }
-          else {
-            alert_msg(gettext("Error :("));
-          }
-        }
-      });
-      toggle_insert();
+      insert_feature(point, p);
     }
   });
+
+  var DblclickFeature = OpenLayers.Class(OpenLayers.Control, {
+    initialize: function (layer, options) {
+      OpenLayers.Control.prototype.initialize.apply(this, [options]);
+      this.handler = new OpenLayers.Handler.Feature(this, layer, {
+        dblclick: this.dblclick,
+        click: this.click
+      });
+    }
+  });
+  var dblclick = new DblclickFeature(globals.hospital_layer, {
+    dblclick: function(event) {
+      var point = event.geometry;
+      map.zoomToExtent(point.bounds);
+    },
+    click: function(event) {
+      onFeatureSelect(event);
+    }
+  });
+  //map.addControl(dblclick);
+  //dblclick.activate();
 
   layers = map.layers;
   for (var i=0; i<layers.length; i++) {
@@ -170,27 +197,58 @@ function init() {
         map.getLayersByName($(ui.option).val())[0].setVisibility(false);
       }
   });
+
   $.nominatim("#autocomplete", {select: function(item) {
     var bb = item.boundingbox;
     bb = new OpenLayers.Bounds(bb[2], bb[0], bb[3], bb[1]);
     bb = bb.transform(new OpenLayers.Projection('EPSG:4326'), new OpenLayers.Projection('EPSG:900913'));
     map.zoomToExtent(bb);
   }});
+
+  $("#search_button").click(function() {
+    globals.hospital_layer.protocol.options.url = globals.urls.get + "?search=" + $("#search").val();
+    globals.hospital_layer.refresh();
+  });
 }
 
 function onPopupClose(evt) {
-  selectControl.unselect(globals.selectedFeature);
+  globals.selectControl.unselect(globals.selectedFeature);
 }
 
-function onFeatureSelect(feature, not_expired) {
-  if (globals.selectedFeature) {
-    selectControl.unselect(globals.selectedFeature);
-  }
-  if (globals.delete_mode) {
+function insert_feature(point) {
+      if (globals.selectedFeature) {
+        globals.selectControl.unselect(globals.selectedFeature);
+      }
+
+      var f = new OpenLayers.Feature.Vector(point);
+      //globals.hospital_layer.addFeatures([f]);
+
+      $.ajax({
+        url: globals.urls.add,
+        type: "post",
+        data: {lat: point.y, lon: point.x},
+        success: function(req) {
+          globals.hospital_layer.refresh();
+          if (req.success === true) {
+            alert_msg(gettext("Point inserted"), "success");
+            f.attributes["id"] = req.id;
+            f.layer = globals.hospital_layer;
+            onFeatureSelect(f, true);
+          }
+          else {
+            alert_msg(gettext("Error :("));
+          }
+        }
+      });
+      toggle_insert();
+}
+
+function delete_feature(feature) {
+  return function() {
     var agree = confirm(gettext("Are you sure you want to delete?"));
     if (agree) {
-      globals.hospital_layer.removeFeatures([feature]);
-      globals.selectedFeature = undefined;
+      //globals.hospital_layer.removeFeatures([feature]);
+      //globals.selectedFeature = undefined;
       $.ajax({
         url: globals.urls.delete.replace("1", feature.attributes.id),
         type: "post",
@@ -202,16 +260,73 @@ function onFeatureSelect(feature, not_expired) {
           else {
             alert_msg(gettext("Error :("), "error");
           }
+          if (globals.selectedFeature) {
+            globals.selectControl.unselect(globals.selectedFeature);
+          }
+          globals.hospital_layer.refresh();
         }
       });
     }
-    toggle_delete();
+  }
+}
+
+function onFeatureSelect(feature, not_expired) {
+  if (globals.insert_mode) {
+    insert_feature(feature.geometry);
+    return;
+  }
+
+  if (globals.selectedFeature) {
+    globals.selectControl.unselect(globals.selectedFeature);
   }
   else {
     globals.selectedFeature = feature;
-    var name = feature.attributes["name"] || gettext("No name");
+    var msg = "";
+
+    if (feature.cluster) {
+      var points_list = $("<ul/>");
+
+      var click_callback = function(f) {
+        return function() {
+          f.layer = globals.hospital_layer
+          globals.selectControl.unselect(globals.selectedFeature);
+          globals.selectControl.select(f);
+          return false;
+        }
+      }
+
+      if (feature.cluster.length === 1 && !globals.username) {
+        click_callback(feature.cluster[0])();
+        return;
+      }
+
+      for (var i=0; i<feature.cluster.length; i++) {
+        var f = feature.cluster[i];
+        var name = f.attributes["name"] || gettext("No name");
+
+        var list_elem = $("<li/>").append(
+          $("<span/>").addClass("a").text(name).click(click_callback(f))
+        );
+        if (globals.username) {
+          list_elem.append(
+            $("<span/>").click(delete_feature(f)).addClass("close del_point").text("×")
+          );
+        }
+        points_list.append(list_elem);
+        msg += "<p>" + name + "</p>";
+      }
+
+      var points = $("<div/>").append(points_list);
+      $("#edit_info").empty().append(points_list);
+    }
+    else {
+      var name = feature.attributes["name"] || gettext("No name")
+      msg += "<p>" + name + "</p>";
+    }
+
     var desc = $("<div/>");
-    desc.html("<p>"+name+"</p>");
+    desc.html(msg);
+
     popup = new OpenLayers.Popup.FramedCloud("chicken",
                 feature.geometry.getBounds().getCenterLonLat(),
                 new OpenLayers.Size(1500,1000),
@@ -221,77 +336,84 @@ function onFeatureSelect(feature, not_expired) {
                 onPopupClose);
     feature.popup = popup;
     map.addPopup(popup);
-    $.get(globals.urls.info.replace("1", globals.selectedFeature.attributes.id), function(data) {
-      $("#edit_info").html(data);
-      if (not_expired) {
-        $(".expired").removeClass("expired");
-        $("#expired_alert").remove();
-      }
-      if (globals.username) {
-      $('.editable').editable(save_feature_edit, {
-        submit: gettext("Save"),
-        cancel: gettext("Cancel"),
-        style: "inherit",
-        width: 180,
-        placeholder: gettext("Click to edit")
-      });
-      $('.editable_text').editable(save_feature_edit, {
-        submit: gettext("Save"),
-        cancel: gettext("Cancel"),
-        style: "inherit",
-        type: "autogrow",
-        rows: 5,
-        cols: 40,
-        placeholder: gettext("Click to edit")
-      });
-      $('.editable_type').editable(save_feature_edit, {
-        submit: gettext("Save"),
-        cancel: gettext("Cancel"),
-        style: "inherit",
-        loadurl: globals.urls.editdata.replace("1", "type"),
-        type: "select",
-        placeholder: gettext("Click to edit")
-      });
-      $('.editable_date').editable(save_feature_edit, {
-        submit: gettext("Save"),
-        cancel: gettext("Cancel"),
-        style: "inherit",
-        type: "masked",
-        mask: "99/99/9999",
-        placeholder: gettext("Click to edit")
-      });
-      $('.editable_time').editable(save_timetable_edit, {
-        style: "inherit",
-        type: "masked",
-        mask: "99:99",
-        placeholder: "00:00"
-      });
-      $('.editable_manager').editable(save_feature_edit, {
-        submit: gettext("Save"),
-        cancel: gettext("Cancel"),
-        style: "inherit",
-        loadurl: globals.urls.editdata.replace("1", "manager"),
-        type: "select",
-        placeholder: gettext("Click to edit")
-      });
-      $('.editable_checkbox').editable(save_feature_edit, {
-        submit: gettext("Save"),
-        cancel: gettext("Cancel"),
-        style: "inherit",
-        type: "checkbox",
-        checkbox: {trueValue: gettext('Yes'),
-                   falseValue: gettext('No')},
-        placeholder: gettext("Click to edit")
-      });
 
-      manytomany_editable(".editable_pathology", "pathology", "pathologies");
-      manytomany_editable(".editable_service", "service", "services");
+    if (!feature.cluster) {
+      get_hospital_data(not_expired);
     }
-    else {
-      $(".edit").removeClass("edit");
-    }
-    });
   }
+}
+
+function get_hospital_data(not_expired) {
+  $.get(globals.urls.info.replace("1", globals.selectedFeature.attributes.id), function(data) {
+    $("#edit_info").html(data);
+    if (not_expired) {
+      $(".expired").removeClass("expired");
+      $("#expired_alert").remove();
+    }
+    if (globals.username) {
+    $('.editable').editable(save_feature_edit, {
+      submit: gettext("Save"),
+      cancel: gettext("Cancel"),
+      style: "inherit",
+      width: 180,
+      placeholder: gettext("Click to edit")
+    });
+    $('.editable_text').editable(save_feature_edit, {
+      submit: gettext("Save"),
+      cancel: gettext("Cancel"),
+      style: "inherit",
+      type: "autogrow",
+      rows: 5,
+      cols: 40,
+      placeholder: gettext("Click to edit")
+    });
+    $('.editable_type').editable(save_feature_edit, {
+      submit: gettext("Save"),
+      cancel: gettext("Cancel"),
+      style: "inherit",
+      loadurl: globals.urls.editdata.replace("1", "type"),
+      type: "select",
+      placeholder: gettext("Click to edit")
+    });
+    $('.editable_date').editable(save_feature_edit, {
+      submit: gettext("Save"),
+      cancel: gettext("Cancel"),
+      style: "inherit",
+      type: "masked",
+      mask: "99/99/9999",
+      placeholder: gettext("Click to edit")
+    });
+    $('.editable_time').editable(save_timetable_edit, {
+      style: "inherit",
+      type: "masked",
+      mask: "99:99",
+      placeholder: "00:00"
+    });
+    $('.editable_manager').editable(save_feature_edit, {
+      submit: gettext("Save"),
+      cancel: gettext("Cancel"),
+      style: "inherit",
+      loadurl: globals.urls.editdata.replace("1", "manager"),
+      type: "select",
+      placeholder: gettext("Click to edit")
+    });
+    $('.editable_checkbox').editable(save_feature_edit, {
+      submit: gettext("Save"),
+      cancel: gettext("Cancel"),
+      style: "inherit",
+      type: "checkbox",
+      checkbox: {trueValue: gettext('Yes'),
+                 falseValue: gettext('No')},
+      placeholder: gettext("Click to edit")
+    });
+
+    manytomany_editable(".editable_pathology", "pathology", "pathologies");
+    manytomany_editable(".editable_service", "service", "services");
+  }
+  else {
+    $(".edit").removeClass("edit");
+  }
+  });
 }
 
 function onFeatureUnselect(feature) {
@@ -302,12 +424,13 @@ function onFeatureUnselect(feature) {
   }
   globals.selectedFeature = undefined;
   $("#edit_info").empty();
+  if (globals.editedFeature) {
+    globals.hospital_layer.refresh();
+    globals.editedFeature = false;
+  }
 }
 
 function toggle_insert() {
-  if (globals.delete_mode) {
-    toggle_delete();
-  }
   if (globals.insert_mode) {
     $("#insert_button").removeClass("success");
     $("#map").removeClass("crosshair");
@@ -318,26 +441,7 @@ function toggle_insert() {
     $("#map").addClass("crosshair");
     globals.insert_mode = true;
     if (globals.selectedFeature) {
-      selectControl.unselect(globals.selectedFeature);
-    }
-  }
-}
-
-function toggle_delete() {
-  if (globals.insert_mode) {
-    toggle_insert();
-  }
-  if (globals.delete_mode) {
-    $("#delete_button").removeClass("success");
-    $("#map").removeClass("crosshair");
-    globals.delete_mode = false;
-  }
-  else {
-    $("#delete_button").addClass("success");
-    $("#map").addClass("crosshair");
-    globals.delete_mode = true;
-    if (globals.selectedFeature) {
-      selectControl.unselect(globals.selectedFeature);
+      globals.selectControl.unselect(globals.selectedFeature);
     }
   }
 }
@@ -356,6 +460,6 @@ function alert_msg(msg, level) {
     $("#alert_box .alert-message").addClass(level);
     $("#alert_box .alert-message").addClass("in");
     $("#alert_msg").html(msg);
-    globals.close_timeout = setTimeout("$('.close').click()", 5000);
+    globals.close_timeout = setTimeout("$('#alert_msg').find('.close').click()", 5000);
   });
 }
