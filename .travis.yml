@@ -17,6 +17,6 @@ before_script:
 - sudo su postgres -c "psql -d template_postgis -f `find /usr/share -name spatial_ref_sys.sql -print -quit`" || true
 - sudo su postgres -c "createdb -T template_postgis hsmapper" || true
 - echo "standard_conforming_strings = off" | sudo tee -a /etc/postgresql/9.1/main/postgresql.conf
-- sudo /etc/init.d/postgresql-9.1 reload
+- sudo /etc/init.d/postgresql reload
 script:
 - python hsmapper/manage.py test --noinput core
