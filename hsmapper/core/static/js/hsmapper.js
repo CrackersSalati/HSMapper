@@ -327,7 +327,6 @@ function onFeatureSelect(feature, not_expired) {
           manager_set[id] = true;
           managers = true;
 
-          console.log("MANAGER!");
           var list_elem = create_list_element(f, click_callback);
           list_elem.append($("<ul/>").attr("id", "manager_"+id));
           points_list.append(list_elem);
@@ -342,7 +341,7 @@ function onFeatureSelect(feature, not_expired) {
 
         if (has_manager) {
           var parent = points_list.find("#manager_"+has_manager)
-          if (parent) {
+          if (parent.length) {
             parent.append(list_elem);
           }
           else {
