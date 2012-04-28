@@ -300,8 +300,17 @@ function onFeatureSelect(feature, not_expired) {
         return;
       }
 
+      // check if there are managers in the cluster
+      var managers = false;
       for (var i=0; i<feature.cluster.length; i++) {
         var f = feature.cluster[i];
+        managers |= !f.attributes["has_manager"];
+      }
+
+      for (var i=0; i<feature.cluster.length; i++) {
+        var f = feature.cluster[i];
+        var has_manager = f.attributes["has_manager"]
+
         var name = f.attributes["name"] || gettext("No name");
 
         var list_elem = $("<li/>").append(
@@ -313,14 +322,18 @@ function onFeatureSelect(feature, not_expired) {
           );
         }
         points_list.append(list_elem);
-        msg += "<p>" + name + "</p>";
+
+        if (!managers || !has_manager) {  // display only if it is a manager
+          msg += "<p>" + name + "</p>";
+        }
       }
 
       var points = $("<div/>").append(points_list);
       $("#edit_info").empty().append(points_list);
     }
     else {
-      var name = feature.attributes["name"] || gettext("No name")
+      var name = feature.attributes["name"] || gettext("No name");
+
       msg += "<p>" + name + "</p>";
     }
 

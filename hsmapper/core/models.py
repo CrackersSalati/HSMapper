@@ -67,6 +67,10 @@ class Facility(models.Model):
 
     objects = models.GeoManager()
 
+    @property
+    def has_manager(self):
+        return self.manager is not None
+
     def __unicode__(self):
         return self.name or ugettext("<No name>")
 

@@ -31,7 +31,7 @@ def get_hospitals(request):
             qs.update(p.facility_set.all())
 
     djf = Django.Django(geodjango="the_geom",
-                        properties=["id", "name"])
+                        properties=["id", "name", "has_manager"])
     geoj = GeoJSON.GeoJSON()
     geojson_output = geoj.encode(djf.decode(qs))
     response = HttpResponse(mimetype="application/json")
