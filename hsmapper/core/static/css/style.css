@@ -222,7 +222,7 @@ ul.ui-widget-header {
 
 .download_data {
     float:right;
-    width: 10%;
+    /*width: 10%; c'era un motivo particolare? a me va su 2 righe... */
 }
 
 #edit_info button {
