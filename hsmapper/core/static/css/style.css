@@ -220,6 +220,11 @@ ul.ui-widget-header {
     display: inline;
 }
 
+.download_data {
+    float:right;
+    width: 10%;
+}
+
 #edit_info button {
     cursor:pointer;
     margin: 1px;
