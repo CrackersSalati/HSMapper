@@ -14,4 +14,6 @@ urlpatterns = patterns('',
         name="api-info-hospital"),
     url(r'^api/edit_hospital_data/(?P<key>\w+)/$',
         api.edit_hospital_data, name="api-edit-hospital-data"),
+    url(r'^api/csv_dump/$',
+        api.csv_dump, name="api-csv-dump"),
 )

@@ -2,6 +2,9 @@
 Views for hsmapper.core
 """
 
+from time import time
+import csv
+
 from vectorformats.Formats import Django, GeoJSON
 from ajaxutils.decorators import ajax
 
@@ -10,6 +13,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
 
 from hsmapper import settings
 from core.models import Facility, FacilityType, Pathology, MedicalService, \
@@ -169,3 +173,20 @@ def delete_hospital(request, id_):
     except Facility.DoesNotExist:
         return {'success': False}
     return {'success': True}
+
+
+def csv_dump(request):
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=hsmapper_%s.csv' \
+        % (int(time()))
+
+    fields = [field.name for field in Facility._meta.fields]
+    writer = csv.DictWriter(response, fieldnames=fields)
+    writer.writeheader()
+    for facility in Facility.objects.all().order_by("pk"):
+        data = {}
+        for field in fields:
+            data[field] = smart_str(getattr(facility, field))
+        writer.writerow(data)
+
+    return response

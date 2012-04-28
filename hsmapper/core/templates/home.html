@@ -75,8 +75,10 @@
       </div>
 
       <div id="search_box">
-        <input type="text" name="search" id="search" placeholder="{% trans "Type to search..." %}" />
-        <button class="btn" id="search_button">{% trans "Search" %}</button>
+        <form name="search_form" action="">
+          <input type="text" name="search" id="search" placeholder="{% trans "Type to search..." %}" />
+          <button type="submit" class="btn" id="search_button">{% trans "Search" %}</button>
+        </form>
       </div>
 
       <div class="buttons">

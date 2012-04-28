@@ -69,10 +69,18 @@ class Facility(models.Model):
 
     @property
     def has_manager(self):
-        return self.manager is not None
+        if self.manager is None or self.manager == self:
+            return 0
+        else:
+            return self.manager.pk
 
     def __unicode__(self):
-        return self.name or ugettext("<No name>")
+        if not self.name:
+            return ugettext("<No name>")
+        if self.name and self.manager and self.manager.manager is None:
+            return "%s (%s)" % (self.name, self.manager)
+        else:
+            return self.name
 
     class Meta:
         verbose_name = _('Facility')

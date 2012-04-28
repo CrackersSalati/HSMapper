@@ -208,6 +208,7 @@ function init() {
   $("#search_button").click(function() {
     globals.hospital_layer.protocol.options.url = globals.urls.get + "?search=" + $("#search").val();
     globals.hospital_layer.refresh();
+    return false;
   });
 }
 
@@ -270,6 +271,21 @@ function delete_feature(feature) {
   }
 }
 
+
+function create_list_element(f, click_callback) {
+  var name = f.attributes["name"] || gettext("No name");
+  var list_elem = $("<li/>").append(
+    $("<span/>").addClass("a").text(name).click(click_callback(f))
+  );
+  if (globals.username) {
+    list_elem.append(
+      $("<span/>").click(delete_feature(f)).addClass("close del_point").text("×")
+    );
+  }
+  return list_elem;
+}
+
+
 function onFeatureSelect(feature, not_expired) {
   if (globals.insert_mode) {
     insert_feature(feature.geometry);
@@ -302,28 +318,40 @@ function onFeatureSelect(feature, not_expired) {
 
       // check if there are managers in the cluster
       var managers = false;
+      var manager_set = {};
       for (var i=0; i<feature.cluster.length; i++) {
         var f = feature.cluster[i];
-        managers |= !f.attributes["has_manager"];
+        var has_manager = f.attributes["has_manager"];
+        if (!has_manager) {  // if is a manager
+          var id = f.attributes["id"];
+          manager_set[id] = true;
+          managers = true;
+
+          console.log("MANAGER!");
+          var list_elem = create_list_element(f, click_callback);
+          list_elem.append($("<ul/>").attr("id", "manager_"+id));
+          points_list.append(list_elem);
+        }
       }
 
       for (var i=0; i<feature.cluster.length; i++) {
         var f = feature.cluster[i];
         var has_manager = f.attributes["has_manager"]
 
-        var name = f.attributes["name"] || gettext("No name");
+        var list_elem = create_list_element(f, click_callback);
 
-        var list_elem = $("<li/>").append(
-          $("<span/>").addClass("a").text(name).click(click_callback(f))
-        );
-        if (globals.username) {
-          list_elem.append(
-            $("<span/>").click(delete_feature(f)).addClass("close del_point").text("×")
-          );
+        if (has_manager) {
+          var parent = points_list.find("#manager_"+has_manager)
+          if (parent) {
+            parent.append(list_elem);
+          }
+          else {
+            points_list.append(list_elem);
+          }
         }
-        points_list.append(list_elem);
 
         if (!managers || !has_manager) {  // display only if it is a manager
+          var name = f.attributes["name"] || gettext("No name");
           msg += "<p>" + name + "</p>";
         }
       }
