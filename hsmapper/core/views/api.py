@@ -181,12 +181,24 @@ def csv_dump(request):
         % (int(time()))
 
     fields = [field.name for field in Facility._meta.fields]
-    writer = csv.DictWriter(response, fieldnames=fields)
+    many_to_many = [field.name for field in Facility._meta.many_to_many]
+    fieldnames = fields + many_to_many
+
+    writer = csv.DictWriter(response, fieldnames=fieldnames)
     writer.writeheader()
+
     for facility in Facility.objects.all().order_by("pk"):
         data = {}
+
         for field in fields:
             data[field] = smart_str(getattr(facility, field))
+
+        # many to many
+        for field in many_to_many:
+            m2m_data = [smart_str(val) for val in \
+                        getattr(facility, field).all()]
+            data[field] = "|".join(m2m_data)
+
         writer.writerow(data)
 
     return response
