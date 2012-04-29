@@ -57,6 +57,10 @@ a {
   color: #00008B;
 }
 
+footer {
+    text-align: center;
+}
+
 a:hover {
 }
 
@@ -95,7 +99,7 @@ a:hover {
 #page {
   margin: 0 auto;
   padding: 20px;
-  height: 83%;
+  height: 75%;
   background: #FFF;
   border: 1px solid #EEE;
   clear: both;

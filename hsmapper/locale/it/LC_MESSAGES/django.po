@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-15 18:06+0200\n"
+"POT-Creation-Date: 2012-04-29 17:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,83 +99,83 @@ msgstr "Validità"
 msgid "Open 24h"
 msgstr "Aperto 24 ore"
 
-#: core/models.py:71
+#: core/models.py:79
 msgid "<No name>"
 msgstr "<Nessun nome>"
 
-#: core/models.py:74 core/models.py:88 core/models.py:114
+#: core/models.py:86 core/models.py:100 core/models.py:126
 msgid "Facility"
 msgstr "Struttura"
 
-#: core/models.py:75
+#: core/models.py:87
 msgid "Facilities"
 msgstr "Strutture"
 
-#: core/models.py:78
+#: core/models.py:90
 msgid "Monday"
 msgstr "Lunedì"
 
-#: core/models.py:79
+#: core/models.py:91
 msgid "Tuesday"
 msgstr "Martedì"
 
-#: core/models.py:80
+#: core/models.py:92
 msgid "Wednesday"
 msgstr "Mercoledì"
 
-#: core/models.py:81
+#: core/models.py:93
 msgid "Thursday"
 msgstr "Giovedì"
 
-#: core/models.py:82
+#: core/models.py:94
 msgid "Friday"
 msgstr "Venerdì"
 
-#: core/models.py:83
+#: core/models.py:95
 msgid "Saturday"
 msgstr "Sabato"
 
-#: core/models.py:84
+#: core/models.py:96
 msgid "Sunday"
 msgstr "Domenica"
 
-#: core/models.py:89 core/models.py:117
+#: core/models.py:101 core/models.py:129
 msgid "Opening time"
 msgstr "Orario di apertura"
 
-#: core/models.py:90 core/models.py:118
+#: core/models.py:102 core/models.py:130
 msgid "Closing time"
 msgstr "Orario di chiusura"
 
-#: core/models.py:91
+#: core/models.py:103
 msgid "Weekday"
 msgstr "Giorno della settimana"
 
-#: core/models.py:92
+#: core/models.py:104
 msgid "Index"
 msgstr "Indice"
 
-#: core/models.py:108
+#: core/models.py:120
 msgid "Opening Time"
 msgstr "Orario di apertura"
 
-#: core/models.py:109
+#: core/models.py:121
 msgid "Opening Times"
 msgstr "Orari di apertura"
 
-#: core/models.py:115
+#: core/models.py:127
 msgid "Date"
 msgstr "Data"
 
-#: core/models.py:116
+#: core/models.py:128
 msgid "Closed all day"
 msgstr "Chiuso tutto il giorno"
 
-#: core/models.py:121
+#: core/models.py:133
 msgid "Special Day"
 msgstr "Giorno speciale"
 
-#: core/models.py:122
+#: core/models.py:134
 msgid "Special Days"
 msgstr "Giorni speciali"
 
@@ -183,25 +183,41 @@ msgstr "Giorni speciali"
 msgid "Health Facilities Distribution Analysis"
 msgstr "Trova il centro pediatrico adatto al tuo bambino"
 
-#: core/templates/base.html:26
+#: core/templates/base.html:27
 msgid "Logged in as"
 msgstr "Autenticato come"
 
-#: core/templates/base.html:27
+#: core/templates/base.html:28
 msgid "Logout"
 msgstr "Logout"
 
-#: core/templates/base.html:29
+#: core/templates/base.html:30
 msgid "Login"
 msgstr "Login"
 
-#: core/templates/base.html:38
+#: core/templates/base.html:44
 msgid "Error"
 msgstr "Errore"
 
-#: core/templates/base.html:38
+#: core/templates/base.html:44
 msgid "something went wrong"
 msgstr "si è verificato un errore"
+
+#: core/templates/base.html:55
+msgid ""
+"HSMapper is an <a href='https://github.com/CrackersSalati/HSMapper'>open "
+"source</a> web platform"
+msgstr ""
+"HSMapper è una piattaforma web <a href='https://github.com/CrackersSalati/HSMapper'>"
+"open source</a>"
+
+#: core/templates/base.html:56
+msgid "Data CC BY-SA by"
+msgstr "Dati CC BY-SA da"
+
+#: core/templates/base.html:57
+msgid "Pediatric facilities data CC BY-SA by"
+msgstr "Dati sulle strutture pediatriche CC BY-SA da"
 
 #: core/templates/home.html:63
 msgid "Map Control"
@@ -219,31 +235,37 @@ msgstr "Contatti"
 msgid "Go to address"
 msgstr "Vai all'indirizzo"
 
-#: core/templates/home.html:78
+#: core/templates/home.html:79
 msgid "Type to search..."
 msgstr "Digita per cercare..."
 
-#: core/templates/home.html:79
+#: core/templates/home.html:80
 msgid "Search"
 msgstr "Cerca"
 
-#: core/templates/home.html:84
+#: core/templates/home.html:86
 msgid "Insert point"
 msgstr "Inserisci punto"
 
-#: core/templates/home.html:94
-msgid ""
-"The project is developed in collaboration with the Italian pediatrics "
-"association (S.I.P. - Società Italiana di Pediatria). It aims at developing "
-"a new informatics platform that helps context-aware location of health "
-"facilities, supporting the timely access to the most appropriate health "
-"resource."
-msgstr ""
-"Il progetto è sviluppato in collaborazione con la Società Italiana di "
-"Pediatria (S.I.P.). L'obbiettivo è sviluppare un supporto informatico che "
-"aiuti nell'individuazione del centro pediatrico idoneo."
-
 #: core/templates/home.html:97
+msgid ""
+"\n"
+"        The project is developed in collaboration with the Italian\n"
+"        pediatrics association (S.I.P. - Società Italiana di Pediatria).\n"
+"        It aims at developing a new informatics platform that helps\n"
+"        context-aware location of health facilities, supporting the\n"
+"        timely access to the most appropriate health resource.\n"
+"        "
+msgstr ""
+"\n"
+"Il progetto è sviluppato in collaborazione con la Società Italiana \n"
+"di Pediatria (S.I.P.). \n"
+"L'obbiettivo è sviluppare un supporto informatico che aiuti \n"
+"nell'individuazione del centro pediatrico \n"
+"idoneo.\n"
+"        "
+
+#: core/templates/home.html:107
 msgid "Developed by"
 msgstr "Sviluppato da"
 
@@ -283,7 +305,7 @@ msgstr "Log out effettuato"
 msgid "Redirect..."
 msgstr "Redirect..."
 
-#: core/views/api.py:121
+#: core/views/api.py:141
 msgid "None"
 msgstr "Nessuna"
 

@@ -1,6 +1,6 @@
 {% load url from future %}
 {% load i18n %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>HSMapper</title>
@@ -50,6 +50,14 @@
       {% block content %}
       {% endblock %}
       </div>
+      <footer>
+        <p>
+          {% trans "HSMapper is an <a href='https://github.com/CrackersSalati/HSMapper'>open source</a> web platform" %} -
+          {% trans "Data CC BY-SA by" %} <a href="http://openstreetmap.org">OpenStreetMap</a> -
+          {% trans "Pediatric facilities data CC BY-SA by" %}  <a href="http://sip.it">S.I.P.</a>
+
+        </p>
+      </footer>
     </div>
   </body>
 </html>
