@@ -8,6 +8,7 @@ import csv
 from vectorformats.Formats import Django, GeoJSON
 from ajaxutils.decorators import ajax
 
+from django.db.models import Q
 from django.contrib.gis.geos.point import Point
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -29,10 +30,25 @@ def get_hospitals(request):
     # TODO: Only for test! must be rewritten ASAP
     search = request.GET.get("search", None)
     if search:
-        pathologies = Pathology.objects.filter(name__contains=search)
         qs = set()
+
+        pathologies = Pathology.objects.filter(name__icontains=search)
         for p in pathologies:
             qs.update(p.facility_set.all())
+
+        services = MedicalService.objects.filter(name__icontains=search)
+        for p in services:
+            qs.update(p.facility_set.all())
+
+        fields = ["name", "description", "address"]
+        query = None
+        for field in fields:
+            current = {"%s__icontains" % field: search}
+            if query is None:
+                query = Q(**current)
+            else:
+                query |= Q(**current)
+        qs.update(Facility.objects.filter(query))
 
     djf = Django.Django(geodjango="the_geom",
                         properties=["id", "name", "has_manager"])
