@@ -205,6 +205,10 @@ function init() {
     map.zoomToExtent(bb);
   }});
 
+  $(".nosubmit").submit(function() {
+    return false;
+  });
+
   $("#search_button").click(function() {
     globals.hospital_layer.protocol.options.url = globals.urls.get + "?search=" + $("#search").val();
     globals.hospital_layer.refresh();
