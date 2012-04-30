@@ -201,7 +201,10 @@ def csv_dump(request):
     fieldnames = fields + many_to_many
 
     writer = csv.DictWriter(response, fieldnames=fieldnames)
-    writer.writeheader()
+    writer.writerow(
+         # writeheader replacement
+        dict([(field, field) for field in fieldnames])
+    )
 
     for facility in Facility.objects.all().order_by("pk"):
         data = {}
